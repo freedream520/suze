@@ -11,8 +11,8 @@ import kr
 
 if __name__ == '__main__':
     t1, t2, v1, v2 = zdrb.run()
-    print 'zdrb', t1, t2, v1, v2
     t1, t2, v1, v2 = hx.run()
-    print 'hx', t1, t2, v1, v2
     t1, t2, v1, v2 = kr.run()
+    print 'zdrb', t1, t2, v1, v2
+    print 'hx', t1, t2, v1, v2
     print 'kr', t1, t2, v1, v2
