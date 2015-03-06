@@ -10,9 +10,9 @@ import kr
 
 
 if __name__ == '__main__':
-    t1, t2, v1, v2 = zdrb.run()
-    t1, t2, v1, v2 = hx.run()
-    t1, t2, v1, v2 = kr.run()
-    print 'zdrb', t1, t2, v1, v2
-    print 'hx', t1, t2, v1, v2
-    print 'kr', t1, t2, v1, v2
+    z = zdrb.run()
+    h = hx.run()
+    k = kr.run()
+    print 'zdrb', z
+    print 'hx', h
+    print 'kr', k
