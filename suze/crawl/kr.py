@@ -16,7 +16,7 @@ from db import DB
 from settings import CRAWL_URLS
 from utils import retrieve
 
-data = [None]
+data = [[]]
 
 
 def text(i, url, params):
@@ -71,7 +71,8 @@ def run():
 
     data = filter(lambda x: len(x) == 7, data)
 
-    sys.stdout.write('total: %s\n' % len(data))
+    total = len(data)
+    sys.stdout.write('total: %s\n' % total)
 
     t = time.time()
     sys.stdout.write('start 36kr MySQLdb executemany...\n')
@@ -83,7 +84,7 @@ def run():
     conn.close()
     t2 = time.time() - t
     sys.stdout.write('done 36kr MySQLdb executemany cost %.3f s\n' % t2)
-    return t1, t2
+    return t1, t2, 101, total
 
 
 if __name__ == '__main__':
