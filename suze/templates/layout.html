@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Suze</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta property="og:site_name" content="suze" />
+    <meta property="og:type" content="wemedia" />
+    {% block seo %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='uikit/css/uikit.gradient.css') }}" />
+    <link href="{{ url_for('static', filename='img/logo.ico') }}" rel="shortcut icon" type="image/x-icon" />
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='uikit/js/uikit.min.js') }}"></script>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+      }
+
+
+      nav {
+        margin-bottom: 30px;
+      }
+
+      #footer {
+        margin: 30px auto 30px;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        margin: 0;
+      }
+    </style>
+    {% block css %}{% endblock %}
+  </head>
+  <body>
+    <div class="uk-width-2-3 uk-container-center" style="padding-top:30px;">
+      {% block container %}
+      {% endblock %}
+      <div id="footer">
+        <p class="uk-width-1-2 uk-container-center" style="text-align:center;">
+          <span style="margin-right:10px;">© suze 2015</span>
+          <a target="_blank" href="https://github.com/liqueur" class="uk-icon-button uk-icon-github"></a>
+          <a target="_blank" href="http://weibo.com/u/5540998006" class="uk-icon-button uk-icon-weibo"></a>
+        </p>
+      </div>
+    </div>
+  </body>
+  {% block js %}{% endblock %}
+</html>

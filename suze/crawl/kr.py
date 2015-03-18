@@ -27,6 +27,7 @@ def text(i, url, params):
     tree = etree.HTML(content)
     t = tree.xpath("//section[@class='article']/*")
     _content = ''.join(map(lambda x: etree.tostring(x, encoding='utf-8'), t))
+    print len(_content)
     data[i].append(_content)
 
 
@@ -69,7 +70,7 @@ def run():
     sys.stdout.write('done 36kr crawl cost %.3f s\n' % t1)
 
 
-    data = filter(lambda x: len(x) == 7, data)
+    data = filter(lambda x: len(x) == 7 and len(x[-1]), data)
 
     total = len(data)
     sys.stdout.write('total: %s\n' % total)

@@ -1,0 +1,64 @@
+{% extends 'common/index.html' %}
+
+{% block css %}
+<style>
+  input[name='username'],
+  input[name='password'],
+  input[name='confirm_password'] {
+    width: 100%;
+  }
+</style>
+{% endblock %}
+
+{% block container %}
+<nav class="uk-navbar">
+  <ul class="uk-navbar-nav">
+    {% include "nav.html" %}
+  </ul>
+  <div class="uk-navbar-flip">
+    <ul class="uk-navbar-nav">
+      {% if current_user.is_authenticated() %}
+      <li class="uk-parent" data-uk-dropdown>
+        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
+        <div class="uk-dropdown uk-dropdown-navbar">
+          <ul class="uk-nav uk-nav-navbar">
+            {% include "dropdown.html" %}
+          </ul>
+        </div>
+      </li>
+      {% else %}
+      <li class="uk-active"><a href="{{ url_for('Common.register') }}">注册</a></li>
+      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+{% block content %}
+<form class="uk-form uk-form-stacked" action="{{ url_for('Common.register') }}" method="POST">
+  <div class="uk-container-center" style="width:250px;">
+    <div class="uk-form-row">
+      {% for message in get_flashed_messages() %}
+      <div class="uk-alert uk-alert-danger" data-uk-alert>{{ message }}<a class="uk-alert-close uk-close"></a></div>
+      {% endfor %}
+    </div>
+    <div class="uk-form-row">
+      {{ form.username.label }}
+      {{ form.username }}
+    </div>
+    <div class="uk-form-row">
+      {{ form.password.label }}
+      {{ form.password }}
+    </div>
+    <div class="uk-form-row">
+      {{ form.confirm_password.label }}
+      {{ form.confirm_password }}
+    </div>
+    <div class="uk-form-row">
+      <button class="uk-button uk-button-primary uk-float-right">注册</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% endblock %}

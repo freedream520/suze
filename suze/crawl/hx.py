@@ -68,7 +68,7 @@ def run():
     t1 = time.time() - t
     sys.stdout.write('done hx crawl cost %.3f s\n' % t1)
 
-    data = filter(lambda x: len(x) == 7, data)
+    data = filter(lambda x: len(x) == 7 and len(x[-1]), data)
 
     total = len(data)
     sys.stdout.write('total: %s\n' % total)

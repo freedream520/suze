@@ -1,0 +1,111 @@
+{% extends 'layout.html' %}
+{% import 'macros.html' as macros %}
+
+{% block css %}
+<style>
+</style>
+{% endblock %}
+
+{% block container %}
+<nav class="uk-navbar">
+  <ul class="uk-navbar-nav">
+    {% include "nav.html" %}
+  </ul>
+  <div class="uk-navbar-flip">
+    <ul class="uk-navbar-nav">
+      {% if current_user.is_authenticated() %}
+      <li class="uk-parent" data-uk-dropdown>
+        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
+        <div class="uk-dropdown uk-dropdown-navbar">
+          <ul class="uk-nav uk-nav-navbar">
+            {% include "dropdown.html" %}
+          </ul>
+        </div>
+      </li>
+      {% else %}
+      <li><a href="{{ url_for('Common.register') }}">注册</a></li>
+      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+{% block content %}
+<div class="uk-grid" style="margin:0;min-height:500px;">
+  <div class="uk-width-2-3 uk-panel uk-panel-box" style="padding:15px;">
+    {% for article in pagination.items %}
+    <div class="uk-grid" style="margin-bottom:20px;">
+      <div class="uk-width-1-5">
+        <img class="uk-thumbnail" style="width:75px;height:75px;margin-right:10px;"
+        src="{{ url_for('Image.retrieve', imagename=article.author.avatar.encode('utf-8')) }}" alt="">
+      </div>
+      <div class="uk-width-4-5" style="padding-left:0;">
+        <h4 class="" style="margin-bottom:0;"><a href="{{ url_for('Article.retrieve', article_id=article.id) }}">{{ article.title }}</a></h4>
+        <div class="uk-text-muted"><a href="">{{ article.author.username }}</a></div>
+        <div class="uk-text-muted">{{ article.brief }}</div>
+      </div>
+    </div>
+    {% if not loop.last %}<hr>{% endif %}
+    {% endfor %}
+  </div>
+  <div class="uk-width-1-3">
+    <div class="" style="margin-bottom:50px;">
+      <h4 style="margin:5px;"><b>活跃用户</b></h4>
+      <div class="uk-clearfix" style="margin:0;margin-bottom:10px;">
+        <span class="uk-badge uk-float-right" style="padding-left:5px;background:#FFD700;">1</span>
+        <img class="uk-thumbnail uk-float-left" style="width:75px;height:75px;padding:4px;margin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;"
+        src="{{ url_for('static', filename='img/user.jpg') }}" alt="">
+        <div class="uk-float-left" style="padding:0;">
+          <div><h4><a href="">user</a></h4></div>
+          <div class="uk-text-muted">投稿: 14</div>
+          <div class="uk-text-muted">积分: 3000</div>
+        </div>
+      </div>
+      <hr>
+      <div class="uk-clearfix" style="margin:0;margin-bottom:10px;">
+        <span class="uk-badge uk-float-right" style="padding-left:5px;background:#c0c0c0;">2</span>
+        <img class="uk-thumbnail uk-float-left" style="width:75px;height:75px;padding:4px;margin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;"
+        src="{{ url_for('static', filename='img/user.jpg') }}" alt="">
+        <div class="uk-float-left" style="padding:0;">
+          <div><h4><a href="">user</a></h4></div>
+          <div class="uk-text-muted">投稿: 14</div>
+          <div class="uk-text-muted">积分: 3000</div>
+        </div>
+      </div>
+      <hr>
+      <div class="uk-clearfix" style="margin:0;margin-bottom:10px;">
+        <span class="uk-badge uk-float-right" style="padding-left:5px;background:#D98719;">3</span>
+        <img class="uk-thumbnail uk-float-left" style="width:75px;height:75px;padding:4px;margin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;mmrgin-right:10px;"
+        src="{{ url_for('static', filename='img/user.jpg') }}" alt="">
+        <div class="uk-float-left" style="padding:0;">
+          <div><h4><a href="">user</a></h4></div>
+          <div class="uk-text-muted">投稿: 14</div>
+          <div class="uk-text-muted">积分: 3000</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4 style="margin:5px;"><b>话题</b></h4>
+      <div class="uk-grid uk-grid-small" data-uk-grid>
+        <div class="uk-width-1-3">
+          <a href="" title="艺术"><img src="{{ url_for('static', filename='img/topic_art.jpg') }}" alt=""></a>
+        </div>
+        <div class="uk-width-1-3">
+          <a href="" title="财经"><img src="{{ url_for('static', filename='img/topic_finance.jpg') }}" alt=""></a>
+        </div>
+        <div class="uk-width-1-3">
+          <a href="" title="阅读"><img src="{{ url_for('static', filename='img/topic_reading.jpg') }}" alt=""></a>
+        </div>
+      </div>
+      <div class="uk-grid uk-grid-small" data-uk-grid>
+        <div class="uk-width-1-3">
+          <a href="" title="体育"><img src="{{ url_for('static', filename='img/topic_sport.jpg') }}" alt=""></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ macros.pagination_widget(pagination, 'Common.index') }}
+
+{% endblock %}
+
+{% endblock %}

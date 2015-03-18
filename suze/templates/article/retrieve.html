@@ -1,0 +1,126 @@
+{% extends 'common/index.html' %}
+
+{% block css %}
+<style>
+  .uk-list li {
+    float: left;
+    margin-right: 10px;
+  }
+
+  article.uk-comment:not(:last-of-type) {
+    margin-bottom: 30px;
+  }
+
+  .uk-comment-body {
+    color: #333;
+  }
+</style>
+{% endblock %}
+
+{% block container %}
+<nav class="uk-navbar">
+  <ul class="uk-navbar-nav">
+    {% include "nav.html" %}
+  </ul>
+  <div class="uk-navbar-flip">
+    <ul class="uk-navbar-nav">
+      {% if current_user.is_authenticated() %}
+      <li class="uk-parent" data-uk-dropdown>
+        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
+        <div class="uk-dropdown uk-dropdown-navbar">
+          <ul class="uk-nav uk-nav-navbar">
+            {% include "dropdown.html" %}
+          </ul>
+        </div>
+      </li>
+      {% else %}
+      <li><a href="{{ url_for('Common.register') }}">注册</a></li>
+      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+{% block content %}
+<div style="">
+  <article class="uk-article">
+    <p class="uk-article-title"><h2>{{ article.title }}</h2></p>
+    <p class="uk-article-meta">
+      <ul class="uk-list uk-clearfix">
+        <li>
+          <a href="">
+            <img class="uk-thumbnail" style="width:75px;height:75px;"
+            src="{{ url_for('Image.retrieve', imagename=article.author.avatar) }}" alt="">
+          </a>
+        </li>
+        <li class="uk-text-muted">
+          <p>
+            <a href="">{{ article.author.username }}</a>
+            <span class="uk-text-mu"> | {{ article.created }}</span>
+          </p>
+          <hr>
+          <p>
+            {% for tag in article.tags.all() %}
+            <span class="uk-badge">{{ tag.tagname }}</span>
+            {% endfor %}
+            {% if not article.tags.all()|length %}
+            <span class="uk-text-muted">无标签</span>
+            {% endif %}
+          </p>
+        </li>
+      </ul>
+    </p>
+    <hr class="uk-article-divider">
+    {{ article.html_content|safe }}
+  </article>
+  <hr class="uk-article-divider">
+  {% for comment in article.comments.filter_by(deleted=False).all()|reverse %}
+  <article class="uk-comment {% if comment.author == article.author %}uk-comment-primary{% endif %}">
+    <header class="uk-comment-header">
+      <a href="">
+        <img class="uk-comment-avatar" src="{{ url_for('Image.retrieve', imagename=comment.author.avatar) }}"
+        width="50" height="50" alt="">
+      </a>
+      <h4 class="uk-comment-title"><a href="">{{ comment.author.username }}</a></h4>
+      <div class="uk-comment-meta">{{ comment.created }} | <a class="reply">回复</a>
+        {% if (comment.author == current_user) or (article.author == current_user) %}
+        &nbsp;|&nbsp;<a href="{{ url_for('Comment.delete', article_id=article.id, comment_id=comment.id) }}" class="uk-text-danger">删除</a>
+        {% endif %}
+      </div>
+    </header>
+    <div class="uk-comment-body">{{ comment.html_content|safe }}</div>
+  </article>
+  {% endfor %}
+  {% if article.comments.filter_by(deleted=False).all()|length %}
+  <hr class="uk-article-divider">
+  {% endif %}
+  <a name="comment"></a>
+  <form method="POST" action="{{ url_for('Comment.create', article_id=article.id) }}" class="uk-form">
+    <div class="uk-form-row">
+      {{ form.content(style="width:100%;", rows="5", id="comment-editor") }}
+    </div>
+    <div class="uk-form-row uk-clearfix">
+      <button type="submit" class="uk-button uk-button-primary uk-float-right">评论</button>
+    </div>
+  </form>
+/div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    var $comment_editor = $("#comment-editor");
+    $(".reply").click(function(){
+      var $parent = $(this).parents(".uk-comment");
+      var author = $parent.find(".uk-comment-title a").text();
+      var content = $parent.find(".uk-comment-body").text();
+      $comment_editor.val("//@" + author + ": " + content);
+      document.getElementById("comment-editor").setSelectionRange(0, 0);
+      window.location.href = "#comment";
+      $comment_editor.focus();
+    });
+  });
+</script>
+{% endblock %}
+
+{% endblock %}

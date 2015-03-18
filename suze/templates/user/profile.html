@@ -1,0 +1,133 @@
+{% extends 'common/index.html' %}
+
+{% block css %}
+<style>
+</style>
+{% endblock %}
+
+{% block container %}
+<nav class="uk-navbar">
+  <ul class="uk-navbar-nav">
+    {% include "nav.html" %}
+  </ul>
+  <div class="uk-navbar-flip">
+    <ul class="uk-navbar-nav">
+      {% if current_user.is_authenticated() %}
+      <li class="uk-parent" data-uk-dropdown>
+        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
+        <div class="uk-dropdown uk-dropdown-navbar">
+          <ul class="uk-nav uk-nav-navbar">
+            {% include "dropdown.html" %}
+          </ul>
+        </div>
+      </li>
+      {% else %}
+      <li class="uk-active"><a href="{{ url_for('Common.login') }}">登录</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+{% block content %}
+<div class="uk-grid" style="padding-left:0;">
+  <div class="uk-width-medium-1-4">
+    <ul class="uk-tab uk-tab-left">
+      <li class="uk-active"><a href="{{ url_for('User.profile', user_id=user.id) }}">个人信息</a></li>
+      <li class=""><a href="#">投稿</a></li>
+      {% if user == current_user %}
+      <li class=""><a href="#">消息</a></li>
+      <li class=""><a href="{{ url_for('User.password', user_id=user.id) }}">安全设置</a></li>
+      {% endif %}
+    </div>
+    <div class="uk-width-medium-3-4">
+      <p>
+        <img style="width:100px;height:100px;" src="{{ url_for('Image.retrieve', imagename=user.avatar) }}" alt="" class="uk-thumbnail">
+      </p>
+      <table border="0">
+        <tr>
+          <td width="80px"><b>{{ user.username }}</b></td>
+        </tr>
+        <tr>
+          <td><b>积分</b></td>
+          <td>{% if profile and profile.score %}{{ profile.score }}{% else %}0{% endif %}</td>
+        </tr>
+        <tr>
+          <td><b>投稿数</b></td>
+          <td>{% if profile and profile.submit %}{{ profile.submit }}{% else %}0{% endif %}</td>
+        </tr>
+      </table>
+      <hr>
+      <table border="0" id="profile-display">
+        <tr>
+          <td width="80px"><b>邮箱</b></td>
+          <td>{% if profile and profile.mail %}{{ profile.mail }}{% endif %}</td>
+        </tr>
+        <tr>
+          <td><b>主页</b></td>
+          <td>{% if profile and profile.homepage %}{{ profile.homepage }}{% endif %}</td>
+        </tr>
+        <tr>
+          <td><b>简介</b></td>
+          <td>{% if profile and profile.brief %}{{ profile.brief }}{% endif %}</td>
+        </tr>
+        <tr>
+          <td>
+            <button type="button" class="uk-button uk-button-primary" id="modify">修改</button>
+          </td>
+        </tr>
+      </table>
+      <form enctype="multipart/form-data" class="uk-form uk-form-stacked uk-hidden" id="profile-editor" method="POST" action="{{ url_for('User.profile', user_id=user.id) }}">
+        <div class="uk-form-row">
+          {{ form.avatar.label(class='uk-form-label') }}
+          {{ form.avatar }}
+          <p class="uk-text-muted">建议图片大小为100x100</p>
+        </div>
+        {% if profile %}
+        <div class="uk-form-row">
+          {{ form.mail.label(class='uk-form-label') }}
+          {{ form.mail(value=profile.mail) }}
+        </div>
+        <div class="uk-form-row">
+          {{ form.homepage.label(class='uk-form-label') }}
+          {{ form.homepage(value=profile.homepage) }}
+        </div>
+        <div class="uk-form-row">
+          {{ form.brief.label(class='uk-form-label') }}
+          {{ form.brief(cols='30', rows='5', value=form.brief) }}
+        </div>
+        <div class="uk-form-row">
+          <button type="submit" class="uk-button uk-button-primary" value="保存">保存</button>
+        </div>
+        {% else %}
+        <div class="uk-form-row">
+          {{ form.mail.label(class='uk-form-label') }}
+          {{ form.mail }}
+        </div>
+        <div class="uk-form-row">
+          {{ form.homepage.label(class='uk-form-label') }}
+          {{ form.homepage }}
+        </div>
+        <div class="uk-form-row">
+          {{ form.brief.label(class='uk-form-label') }}
+          {{ form.brief(cols='30', rows='5') }}
+        </div>
+        <div class="uk-form-row">
+          <button type="submit" class="uk-button uk-button-primary" value="保存">保存</button>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  $("#modify").click(function(){
+    $("#profile-display").addClass("uk-hidden");
+    $("#profile-editor").removeClass("uk-hidden");
+  });
+</script>
+{% endblock %}
+
+{% endblock %}
