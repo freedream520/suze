@@ -22,7 +22,7 @@
         </div>
       </li>
       {% else %}
-      <li class="uk-active"><a href="{{ url_for('Common.login') }}">登录</a></li>
+      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
       {% endif %}
     </ul>
   </div>
@@ -33,7 +33,7 @@
   <div class="uk-width-medium-1-4">
     <ul class="uk-tab uk-tab-left">
       <li class="uk-active"><a href="{{ url_for('User.profile', user_id=user.id) }}">个人信息</a></li>
-      <li class=""><a href="#">投稿</a></li>
+      <li class=""><a href="{{ url_for('User.article', user_id=user.id) }}">投稿</a></li>
       {% if user == current_user %}
       <li class=""><a href="#">消息</a></li>
       <li class=""><a href="{{ url_for('User.password', user_id=user.id) }}">安全设置</a></li>
@@ -70,11 +70,13 @@
           <td><b>简介</b></td>
           <td>{% if profile and profile.brief %}{{ profile.brief }}{% endif %}</td>
         </tr>
+        {% if current_user == user %}
         <tr>
           <td>
             <button type="button" class="uk-button uk-button-primary" id="modify">修改</button>
           </td>
         </tr>
+        {% endif %}
       </table>
       <form enctype="multipart/form-data" class="uk-form uk-form-stacked uk-hidden" id="profile-editor" method="POST" action="{{ url_for('User.profile', user_id=user.id) }}">
         <div class="uk-form-row">

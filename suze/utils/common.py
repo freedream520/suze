@@ -29,3 +29,7 @@ def save_file(f):
 
 def parse_json(json_string):
     return json.loads(json_string)
+
+
+def parse_tags(tags):
+    return '#'.join([x.tagname for x in tags])

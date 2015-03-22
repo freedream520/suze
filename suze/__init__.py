@@ -5,7 +5,7 @@ import settings
 from flask import Flask, g
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
-from utils.common import parse_json
+from utils.common import parse_json, parse_tags
 
 db = None
 
@@ -24,6 +24,7 @@ def setup_global(app):
     @app.before_request
     def before_request():
         g.parse_json = parse_json
+        g.parse_tags = parse_tags
 
 def setup_blueprint(app):
     from common import BPCommon

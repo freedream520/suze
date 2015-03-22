@@ -2,7 +2,7 @@
 <ul class="uk-pagination" style="margin-top:30px;">
   <li {% if not pagination.has_prev %}class="uk-disabled"{% endif %}>
     {% if pagination.has_prev %}
-    <a href="{{ url_for(endpoint, page=pagination.page - 1) }}">
+    <a href="{{ url_for(endpoint, page=pagination.page - 1, **kwargs) }}">
       <i class="uk-icon-angle-double-left"></i>
     </a>
     {% else %}
@@ -16,7 +16,7 @@
       {% if p == pagination.page %}
       <li class="uk-active"><span>{{ p }}</span></li>
       {% else %}
-      <li><a href="{{ url_for(endpoint, page=p)}}">{{ p }}</a></li>
+      <li><a href="{{ url_for(endpoint, page=p, **kwargs)}}">{{ p }}</a></li>
       {% endif %}
     {% else %}
     <li class="disabled"><a href="#">&hellip;</a></li>
@@ -24,7 +24,7 @@
   {% endfor %}
   <li {% if not pagination.has_next %}class="uk-disabled"{% endif %}>
     {% if pagination.has_next %}
-    <a href="{{ url_for(endpoint, page=pagination.page + 1) }}">
+    <a href="{{ url_for(endpoint, page=pagination.page + 1, **kwargs) }}">
       <i class="uk-icon-angle-double-right"></i>
     </a>
     {% else %}

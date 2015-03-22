@@ -48,14 +48,14 @@
     <p class="uk-article-meta">
       <ul class="uk-list uk-clearfix">
         <li>
-          <a href="">
+          <a href="{{ url_for('User.profile', user_id=article.author.id) }}">
             <img class="uk-thumbnail" style="width:75px;height:75px;"
             src="{{ url_for('Image.retrieve', imagename=article.author.avatar) }}" alt="">
           </a>
         </li>
         <li class="uk-text-muted">
           <p>
-            <a href="">{{ article.author.username }}</a>
+            <a href="{{ url_for('User.profile', user_id=article.author.id) }}">{{ article.author.username }}</a>
             <span class="uk-text-mu"> | {{ article.created }}</span>
           </p>
           <hr>
@@ -70,6 +70,12 @@
         </li>
       </ul>
     </p>
+    {% if current_user == article.author %}
+    <p>
+      <a class="uk-button uk-button-success" href="{{ url_for('Article.update', article_id=article.id) }}">修改</a>
+      <button id="delete" onclick="delete_article(this)" class="uk-button uk-button-danger" type="button" link="{{ url_for('Article.delete', article_id=article.id) }}">删除</button>
+    </p>
+    {% endif %}
     <hr class="uk-article-divider">
     {{ article.html_content|safe }}
   </article>
@@ -103,7 +109,7 @@
       <button type="submit" class="uk-button uk-button-primary uk-float-right">评论</button>
     </div>
   </form>
-/div>
+</div>
 {% endblock %}
 
 {% block js %}
@@ -119,6 +125,12 @@
       window.location.href = "#comment";
       $comment_editor.focus();
     });
+
+    delete_article = function(obj){
+      if(confirm("确认删除这篇文章?")){
+        window.location.href = $(obj).attr("link");
+      }
+    }
   });
 </script>
 {% endblock %}

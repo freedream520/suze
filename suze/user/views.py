@@ -9,14 +9,14 @@ from flask import render_template, url_for, request, redirect, flash
 from flask.ext.login import current_user
 from forms import ProfileForm, PasswordForm
 from suze.user import BPUser
-from suze.models import User
+from suze.models import User, Article
 from suze.utils.common import save_file
 
 
 @BPUser.route('/profile/<int:user_id>/', methods=['GET', 'POST'])
 def profile(user_id):
     user = User.query.get(user_id)
-    if not user or (current_user != user):
+    if not user:
         return redirect(url_for('Common.index'))
 
     form = ProfileForm(request.form)
@@ -71,3 +71,16 @@ def password(user_id):
             flash('请按格式填写表单', 'error')
 
     return render_template('user/password.html', user=user, form=form)
+
+
+@BPUser.route('/article/<int:user_id>/')
+@BPUser.route('/article/<int:user_id>/<int:page>/')
+def article(user_id, page=1):
+    user = User.query.get(user_id)
+    if not user:
+        return redirect(url_for('Common.index'))
+
+    pagination = user.articles.order_by(Article.id.desc())\
+            .paginate(page, per_page=10, error_out=True)
+
+    return render_template('user/article.html', user=user, pagination=pagination)

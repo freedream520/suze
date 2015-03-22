@@ -35,12 +35,12 @@
     {% for article in pagination.items %}
     <div class="uk-grid" style="margin-bottom:20px;">
       <div class="uk-width-1-5">
-        <img class="uk-thumbnail" style="width:75px;height:75px;margin-right:10px;"
-        src="{{ url_for('Image.retrieve', imagename=article.author.avatar.encode('utf-8')) }}" alt="">
+        <a href="{{ url_for('User.profile', user_id=article.author.id) }}"><img class="uk-thumbnail" style="width:75px;height:75px;margin-right:10px;"
+          src="{{ url_for('Image.retrieve', imagename=article.author.avatar.encode('utf-8')) }}" alt=""></a>
       </div>
       <div class="uk-width-4-5" style="padding-left:0;">
         <h4 class="" style="margin-bottom:0;"><a href="{{ url_for('Article.retrieve', article_id=article.id) }}">{{ article.title }}</a></h4>
-        <div class="uk-text-muted"><a href="">{{ article.author.username }}</a></div>
+        <div class="uk-text-muted"><a href="{{ url_for('User.profile', user_id=article.author.id) }}">{{ article.author.username }}</a></div>
         <div class="uk-text-muted">{{ article.brief }}</div>
       </div>
     </div>
