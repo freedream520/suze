@@ -10,30 +10,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='umeditor/themes/default/_css/umeditor.css') }}">
 {% endblock %}
 
-{% block container %}
-<nav class="uk-navbar">
-  <ul class="uk-navbar-nav">
-    {% include "nav.html" %}
-  </ul>
-  <div class="uk-navbar-flip">
-    <ul class="uk-navbar-nav">
-      {% if current_user.is_authenticated() %}
-      <li class="uk-parent" data-uk-dropdown>
-        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
-        <div class="uk-dropdown uk-dropdown-navbar">
-          <ul class="uk-nav uk-nav-navbar">
-            {% include "dropdown.html" %}
-          </ul>
-        </div>
-      </li>
-      {% else %}
-      <li><a href="{{ url_for('Common.register') }}">注册</a></li>
-      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
-      {% endif %}
-    </ul>
-  </div>
-</nav>
-
 {% block content %}
 <form class="uk-form uk-form-stacked uk-width-medium-1-1 uk-container-center"
   method="POST" action="{{ url_for('Article.create') }}">
@@ -54,8 +30,6 @@
     <button id="create" type="submit" class="uk-button uk-button-primary uk-float-right">发布</button>
   </div>
 </form>
-{% endblock %}
-
 {% endblock %}
 
 {% block js %}

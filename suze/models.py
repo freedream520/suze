@@ -6,35 +6,6 @@ from flask.ext.login import UserMixin
 from suze import db
 
 
-class Message(db.Model):
-    __tablename__ = 'message'
-
-    id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    content = db.Column(db.TEXT)
-    created = db.Column(db.TIMESTAMP)
-    readed = db.Column(db.Boolean, default=False)
-    deleted = db.Column(db.Boolean, default=False)
-
-    def __init__(self, sender_id, receiver_id, content):
-        self.sender_id = sender_id
-        self.receiver_id = receiver_id
-        self.content = content
-        self.created = time.strftime('%Y-%m-%d %H:%M:%S')
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
 
@@ -44,8 +15,6 @@ class User(db.Model, UserMixin):
     avatar = db.Column(db.String(80))
     articles = db.relationship('Article', backref='author', lazy='dynamic')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
-    sended_messages = db.relationship('Message', backref='sender', lazy='dynamic', remote_side=[Message.sender_id])
-    received_messages = db.relationship('Message', backref='receiver', lazy='dynamic', remote_side=[Message.receiver_id])
     verbose = db.Column(db.TEXT)
 
     def __init__(self, username, password, avatar, verbose):

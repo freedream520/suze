@@ -1,8 +1,9 @@
 {% extends 'common/index.html' %}
 
 {% block css %}
+{{ super() }}
 <style>
-  .uk-list li {
+  article .uk-list li {
     float: left;
     margin-right: 10px;
   }
@@ -14,42 +15,32 @@
   .uk-comment-body {
     color: #333;
   }
+
+  img.avatar {
+    width: 75px;
+    height: 75px;
+  }
+
+  img.uk-comment-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  h4.uk-comment-title {
+    margin: 0;
+  }
 </style>
 {% endblock %}
 
-{% block container %}
-<nav class="uk-navbar">
-  <ul class="uk-navbar-nav">
-    {% include "nav.html" %}
-  </ul>
-  <div class="uk-navbar-flip">
-    <ul class="uk-navbar-nav">
-      {% if current_user.is_authenticated() %}
-      <li class="uk-parent" data-uk-dropdown>
-        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
-        <div class="uk-dropdown uk-dropdown-navbar">
-          <ul class="uk-nav uk-nav-navbar">
-            {% include "dropdown.html" %}
-          </ul>
-        </div>
-      </li>
-      {% else %}
-      <li><a href="{{ url_for('Common.register') }}">注册</a></li>
-      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
-      {% endif %}
-    </ul>
-  </div>
-</nav>
-
-{% block content %}
-<div style="">
+{% block main %}
+<div>
   <article class="uk-article">
-    <p class="uk-article-title"><h2>{{ article.title }}</h2></p>
+    <h2>{{ article.title }}</h2>
     <p class="uk-article-meta">
       <ul class="uk-list uk-clearfix">
         <li>
           <a href="{{ url_for('User.profile', user_id=article.author.id) }}">
-            <img class="uk-thumbnail" style="width:75px;height:75px;"
+            <img class="avatar"
             src="{{ url_for('Image.retrieve', imagename=article.author.avatar) }}" alt="">
           </a>
         </li>
@@ -113,6 +104,7 @@
 {% endblock %}
 
 {% block js %}
+{{ super() }}
 <script type="text/javascript">
   $(document).ready(function(){
     var $comment_editor = $("#comment-editor");
@@ -133,6 +125,4 @@
     }
   });
 </script>
-{% endblock %}
-
 {% endblock %}

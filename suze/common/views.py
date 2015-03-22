@@ -16,6 +16,7 @@ from suze.models import User, Article
 def index(page=1):
     pagination = Article.query.filter_by(deleted=False).order_by(Article.id.desc())\
             .paginate(page, per_page=10, error_out=True)
+
     return render_template('common/index.html', pagination=pagination)
 
 
@@ -31,7 +32,7 @@ def login():
             redirect_uri = request.args.get('redirect_uri', url_for('Common.index'))
             return redirect(redirect_uri)
 
-    return render_template('common/login.html', form=form)
+    return render_template('common/index.html', login_form=form)
 
 
 @BPCommon.route('/logout/', methods=['GET'])
@@ -50,16 +51,16 @@ def register():
 
         if User.query.filter_by(username=username).first():
             flash('用户名已存在')
-            return render_template('common/register.html', form=form)
+            return redirect(url_for('Common.index'))
 
         if password != confirm_password:
             flash('密码不一致')
-            return render_template('common/register.html', form=form)
+            return redirect(url_for('Common.index'))
 
         user = User(username, password, '', '')
         user.save()
         login_user(user)
 
-        return redirect(url_for('Common.index', page=1))
+        return redirect(url_for('Common.index'))
 
-    return render_template('common/register.html', form=form)
+    return redirect(url_for('Common.index'))

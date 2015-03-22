@@ -21,10 +21,13 @@ def create_app():
     return app
 
 def setup_global(app):
+    from suze.common.forms import LoginForm, RegisterForm
     @app.before_request
     def before_request():
         g.parse_json = parse_json
         g.parse_tags = parse_tags
+        g.login_form = LoginForm()
+        g.register_form = RegisterForm()
 
 def setup_blueprint(app):
     from common import BPCommon

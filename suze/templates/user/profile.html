@@ -2,34 +2,15 @@
 
 {% block css %}
 <style>
+  img.avatar {
+    width: 100px;
+    height: 100px;
+  }
 </style>
 {% endblock %}
 
-{% block container %}
-<nav class="uk-navbar">
-  <ul class="uk-navbar-nav">
-    {% include "nav.html" %}
-  </ul>
-  <div class="uk-navbar-flip">
-    <ul class="uk-navbar-nav">
-      {% if current_user.is_authenticated() %}
-      <li class="uk-parent" data-uk-dropdown>
-        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
-        <div class="uk-dropdown uk-dropdown-navbar">
-          <ul class="uk-nav uk-nav-navbar">
-            {% include "dropdown.html" %}
-          </ul>
-        </div>
-      </li>
-      {% else %}
-      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
-      {% endif %}
-    </ul>
-  </div>
-</nav>
-
 {% block content %}
-<div class="uk-grid" style="padding-left:0;">
+<div class="uk-grid">
   <div class="uk-width-medium-1-4">
     <ul class="uk-tab uk-tab-left">
       <li class="uk-active"><a href="{{ url_for('User.profile', user_id=user.id) }}">个人信息</a></li>
@@ -41,7 +22,7 @@
     </div>
     <div class="uk-width-medium-3-4">
       <p>
-        <img style="width:100px;height:100px;" src="{{ url_for('Image.retrieve', imagename=user.avatar) }}" alt="" class="uk-thumbnail">
+        <img class="avatar" src="{{ url_for('Image.retrieve', imagename=user.avatar) }}" alt="" class="uk-thumbnail">
       </p>
       <table border="0">
         <tr>
@@ -99,6 +80,7 @@
         </div>
         <div class="uk-form-row">
           <button type="submit" class="uk-button uk-button-primary" value="保存">保存</button>
+          <button type="button" class="uk-button uk-button-default form-cancel" value="取消">取消</button>
         </div>
         {% else %}
         <div class="uk-form-row">
@@ -115,6 +97,7 @@
         </div>
         <div class="uk-form-row">
           <button type="submit" class="uk-button uk-button-primary" value="保存">保存</button>
+          <button type="button" class="uk-button uk-button-default form-cancel" value="取消">取消</button>
         </div>
         {% endif %}
       </form>
@@ -129,7 +112,10 @@
     $("#profile-display").addClass("uk-hidden");
     $("#profile-editor").removeClass("uk-hidden");
   });
-</script>
-{% endblock %}
 
+  $(".form-cancel").click(function(){
+    $("#profile-display").removeClass("uk-hidden");
+    $("#profile-editor").addClass("uk-hidden");
+  });
+</script>
 {% endblock %}
