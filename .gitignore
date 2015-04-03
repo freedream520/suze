@@ -1,10 +1,4 @@
 *.pyc
 *.swp
 
-*.jpeg
-*.jpg
-*.png
-*.gif
-*.bmp
-
 wemedia_crawl_data.sql

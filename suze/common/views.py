@@ -32,7 +32,7 @@ def login():
             redirect_uri = request.args.get('redirect_uri', url_for('Common.index'))
             return redirect(redirect_uri)
 
-    return render_template('common/index.html', login_form=form)
+    return redirect(url_for('Common.index'))
 
 
 @BPCommon.route('/logout/', methods=['GET'])

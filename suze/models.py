@@ -66,6 +66,7 @@ class Article(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     tags = db.relationship('Tag', backref='article', lazy='dynamic')
     comments = db.relationship('Comment', backref='article', lazy='dynamic')
+    clicks = db.Column(db.Integer, default=0)
 
     def __init__(self, author_id, title, brief, tags, raw_content, html_content):
         self.author_id = author_id
