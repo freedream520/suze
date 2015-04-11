@@ -1,0 +1,94 @@
+{% extends 'common/index.html' %}
+
+{% block center_block %}
+<div class="modal fade" id="new-category-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">新建栏目</h4>
+      </div>
+      <form enctype="multipart/form-data" action="{{ url_for('Admin.category') }}" method="POST">
+        <div class="modal-body">
+            <div class="form-group">
+              {{ category_form.category_name.label }}
+              {{ category_form.category_name(class='form-control') }}
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-primary">新建</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="update-category-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">编辑栏目</h4>
+      </div>
+      <form enctype="multipart/form-data" action="{{ url_for('Admin.update_category') }}" method="POST">
+        <div class="modal-body">
+          {{ category_update_form.category_id }}
+          <div class="form-group">
+            {{ category_update_form.category_name.label }}
+            {{ category_update_form.category_name(class='form-control') }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-primary">修改</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked nav-pills-stacked-example">
+      <li role="presentation"><a href="{{ url_for('Admin.analyse') }}">数据统计</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.carousel') }}">轮播编辑</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.article') }}">文章管理</a></li>
+      <li role="presentation" class="active"><a href="{{ url_for('Admin.category') }}">栏目管理</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.permission') }}">用户权限管理</a></li>
+    </ul>
+  </div>
+  <div class="col-md-9 clearfix">
+    <table class="table">
+      <tr>
+        <th style="text-align:center;">栏目名</th>
+        <th style="text-align:center;">操作</th>
+      </tr>
+      {% for category in categorys %}
+      <tr>
+        <td style="text-align:center;">{{ category.category_name }}</td>
+        <td style="text-align:center;">
+          <button category_id="{{ category.id }}" category_name="{{ category.category_name }}" data-toggle="modal" data-target="#update-category-modal" type="button" class="btn btn-default update-category">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#new-category-modal">
+      新建栏目
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function(){
+    $(".update-category").click(function(){
+      var category_name = $(this).attr("category_name");
+      var category_id = $(this).attr("category_id");
+      $("#update-category-modal input[name='category_name']").val(category_name);
+      $("#update-category-modal input[name='category_id']").val(category_id);
+    });
+  });
+</script>
+{% endblock %}

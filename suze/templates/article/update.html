@@ -1,61 +1,46 @@
 {% extends 'common/index.html' %}
 
-{% block css %}
+{% block main %}
 <style>
-  .uk-list li {
-    float: left;
-    margin-right: 10px;
+  .edui-body-container img {
+    max-width: 80%;
   }
 </style>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form enctype="multipart/form-data" method="POST" action="{{ url_for('Article.update', article_id=article.id) }}">
+      {{ form.raw_content }}
+      <div class="form-group">
+        <h4>编辑文章</h4>
+        <hr>
+      </div>
+      <div class="form-group">
+        {{ form.title.label }}
+        {{ form.title(class="form-control", value=article.title) }}
+      </div>
+      <div class="form-group">
+        {{ form.category_id.label }}
+        {{ form.category_id(class="form-control", value=article.category_id) }}
+      </div>
+      <div class="form-group">
+        {{ form.cover.label }}
+        {{ form.cover }}
+      </div>
+      <input type="hidden" id="article-content" value="{{ article.html_content }}">
+      <div class="form-group">
+        {{ form.html_content.label }}
+        <textarea id="editor" style="width:100%;height:240px;margin:0;padding:0;" name="html_content">{{ article.html_content }}</textarea>
+      </div>
+      <div class="form-group clearfix">
+        <button id="create" type="submit" class="btn btn-primary pull-right">修改</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='umeditor/themes/default/_css/umeditor.css') }}">
-{% endblock %}
-
-{% block container %}
-<nav class="uk-navbar">
-  <ul class="uk-navbar-nav">
-    {% include "nav.html" %}
-  </ul>
-  <div class="uk-navbar-flip">
-    <ul class="uk-navbar-nav">
-      {% if current_user.is_authenticated() %}
-      <li class="uk-parent" data-uk-dropdown>
-        <a href="">{{ current_user.username }} <i class="uk-icon-caret-down"></i></a>
-        <div class="uk-dropdown uk-dropdown-navbar">
-          <ul class="uk-nav uk-nav-navbar">
-            {% include "dropdown.html" %}
-          </ul>
-        </div>
-      </li>
-      {% else %}
-      <li><a href="{{ url_for('Common.register') }}">注册</a></li>
-      <li><a href="{{ url_for('Common.login') }}">登录</a></li>
-      {% endif %}
-    </ul>
-  </div>
-</nav>
-
-{% block content %}
-<form class="uk-form uk-form-stacked uk-width-medium-1-1 uk-container-center"
-  method="POST" action="{{ url_for('Article.update', article_id=article.id) }}">
-  {{ form.raw_content }}
-  <div class="uk-form-row">
-    {{ form.title.label(class='uk-form-label') }}
-    {{ form.title(value=article.title, style="width:50%;") }}
-  </div>
-  <div class="uk-form-row">
-    {{ form.tags.label(class='uk-form-label') }}
-    {{ form.tags(value=tags, style="width:50%;") }}
-  </div>
-  <div class="uk-form-row">
-    {{ form.html_content.label(class='uk-form-label') }}
-    <textarea id="editor" name="html_content" cols="30" rows="10" style="width:100%;height:240px;">{{ article.html_content }}</textarea>
-  </div>
-  <div class="uk-form-row uk-clearfix">
-    <button id="create" type="submit" class="uk-button uk-button-primary uk-float-right">发布</button>
-  </div>
-</form>
-{% endblock %}
-
 {% endblock %}
 
 {% block js %}
@@ -67,6 +52,9 @@
     $("#create").click(function(){
       $("#raw_content").val(um.getContentTxt());
     });
+
+    var category_id = $("#category_id").attr("value");
+    $("#category_id option[value=" + category_id + "]").attr("selected", "selected");
   });
 </script>
 {% endblock %}

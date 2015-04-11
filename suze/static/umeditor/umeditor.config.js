@@ -136,9 +136,9 @@
         UMEDITOR_HOME_URL : URL
 
         //图片上传配置区
-        ,imageUrl:URL+"php/imageUp.php"             //图片上传提交地址
-        ,imagePath:URL + "php/"                     //图片修正地址，引用了fixedImagePath,如有特殊需求，可自行配置
+        ,imageUrl:"/image/create/"             //图片上传提交地址
         ,imageFieldName:"upfile"                   //图片数据的key,若此处修改，需要在后台对应文件修改对应参数
+        ,imagePath:"http://" + document.location.hostname + ":" + document.location.port
 
 
         //工具栏上的所有的功能按钮和下拉框，可以在new编辑器的实例时选择自己需要的从新定义
@@ -192,7 +192,7 @@
 
         //如果自定义，最好给p标签如下的行高，要不输入中文时，会有跳动感
         //注意这里添加的样式，最好放在.edui-editor-body .edui-body-container这两个的下边，防止跟页面上css冲突
-        //,initialStyle:'.edui-editor-body .edui-body-container p{line-height:1em}'
+        ,initialStyle:'.edui-editor-body .edui-body-container p{line-height:1em;}; .edui-editor-body .edui-body-container img{width:200px;};'
 
         //,autoSyncData:true //自动同步编辑器要提交的数据
 

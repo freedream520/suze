@@ -1,121 +1,93 @@
-{% extends 'common/index.html' %}
+{% extends "common/index.html" %}
 
-{% block css %}
-<style>
-  img.avatar {
-    width: 100px;
-    height: 100px;
-  }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="uk-grid">
-  <div class="uk-width-medium-1-4">
-    <ul class="uk-tab uk-tab-left">
-      <li class="uk-active"><a href="{{ url_for('User.profile', user_id=user.id) }}">个人信息</a></li>
-      <li class=""><a href="{{ url_for('User.article', user_id=user.id) }}">投稿</a></li>
-      {% if user == current_user %}
-      <li class=""><a href="#">消息</a></li>
-      <li class=""><a href="{{ url_for('User.password', user_id=user.id) }}">安全设置</a></li>
-      {% endif %}
-    </div>
-    <div class="uk-width-medium-3-4">
-      <p>
-        <img class="avatar" src="{{ url_for('Image.retrieve', imagename=user.avatar) }}" alt="" class="uk-thumbnail">
-      </p>
-      <table border="0">
-        <tr>
-          <td width="80px"><b>{{ user.username }}</b></td>
-        </tr>
-        <tr>
-          <td><b>积分</b></td>
-          <td>{% if profile and profile.score %}{{ profile.score }}{% else %}0{% endif %}</td>
-        </tr>
-        <tr>
-          <td><b>投稿数</b></td>
-          <td>{% if profile and profile.submit %}{{ profile.submit }}{% else %}0{% endif %}</td>
-        </tr>
-      </table>
-      <hr>
-      <table border="0" id="profile-display">
-        <tr>
-          <td width="80px"><b>邮箱</b></td>
-          <td>{% if profile and profile.mail %}{{ profile.mail }}{% endif %}</td>
-        </tr>
-        <tr>
-          <td><b>主页</b></td>
-          <td>{% if profile and profile.homepage %}{{ profile.homepage }}{% endif %}</td>
-        </tr>
-        <tr>
-          <td><b>简介</b></td>
-          <td>{% if profile and profile.brief %}{{ profile.brief }}{% endif %}</td>
-        </tr>
-        {% if current_user == user %}
-        <tr>
-          <td>
-            <button type="button" class="uk-button uk-button-primary" id="modify">修改</button>
-          </td>
-        </tr>
-        {% endif %}
-      </table>
-      <form enctype="multipart/form-data" class="uk-form uk-form-stacked uk-hidden" id="profile-editor" method="POST" action="{{ url_for('User.profile', user_id=user.id) }}">
-        <div class="uk-form-row">
-          {{ form.avatar.label(class='uk-form-label') }}
-          {{ form.avatar }}
-          <p class="uk-text-muted">建议图片大小为100x100</p>
+{% block main %}
+<!-- 个人信息设置模态框 -->
+<div class="modal fade" id="profile-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">个人信息</h4>
+      </div>
+      <form enctype="multipart/form-data" action="{{ url_for('User.profile', user_id=user.id) }}" method="POST">
+        <div class="modal-body">
+          <div class="form-group">
+            {{ profile_form.avatar.label }}
+            {{ profile_form.avatar }}
+            <p class="text-muted">建议图片大小为100x100</p>
+          </div>
+          {% if profile %}
+          <div class="form-group">
+            {{ profile_form.brief.label }}
+            {{ profile_form.brief(value=profile.brief, class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ profile_form.homepage.label }}
+            {{ profile_form.homepage(value=profile.homepage, class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ profile_form.mail.label }}
+            {{ profile_form.mail(value=profile.mail, class='form-control') }}
+          </div>
+          {% else %}
+          <div class="form-group">
+            {{ profile_form.brief.label }}
+            {{ profile_form.brief(class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ profile_form.homepage.label }}
+            {{ profile_form.homepage(class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ profile_form.mail.label }}
+            {{ profile_form.mail(class='form-control') }}
+          </div>
+          {% endif %}
         </div>
-        {% if profile %}
-        <div class="uk-form-row">
-          {{ form.mail.label(class='uk-form-label') }}
-          {{ form.mail(value=profile.mail) }}
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-primary">修改</button>
         </div>
-        <div class="uk-form-row">
-          {{ form.homepage.label(class='uk-form-label') }}
-          {{ form.homepage(value=profile.homepage) }}
-        </div>
-        <div class="uk-form-row">
-          {{ form.brief.label(class='uk-form-label') }}
-          {{ form.brief(cols='30', rows='5', value=form.brief) }}
-        </div>
-        <div class="uk-form-row">
-          <button type="submit" class="uk-button uk-button-primary" value="保存">保存</button>
-          <button type="button" class="uk-button uk-button-default form-cancel" value="取消">取消</button>
-        </div>
-        {% else %}
-        <div class="uk-form-row">
-          {{ form.mail.label(class='uk-form-label') }}
-          {{ form.mail }}
-        </div>
-        <div class="uk-form-row">
-          {{ form.homepage.label(class='uk-form-label') }}
-          {{ form.homepage }}
-        </div>
-        <div class="uk-form-row">
-          {{ form.brief.label(class='uk-form-label') }}
-          {{ form.brief(cols='30', rows='5') }}
-        </div>
-        <div class="uk-form-row">
-          <button type="submit" class="uk-button uk-button-primary" value="保存">保存</button>
-          <button type="button" class="uk-button uk-button-default form-cancel" value="取消">取消</button>
-        </div>
-        {% endif %}
       </form>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block js %}
-<script type="text/javascript">
-  $("#modify").click(function(){
-    $("#profile-display").addClass("uk-hidden");
-    $("#profile-editor").removeClass("uk-hidden");
-  });
-
-  $(".form-cancel").click(function(){
-    $("#profile-display").removeClass("uk-hidden");
-    $("#profile-editor").addClass("uk-hidden");
-  });
-</script>
+<div class="panel panel-default" style="padding:10px;">
+  <div class="media">
+    <div class="media-left">
+      <a href="#">
+        <img class="media-object" src="{{ url_for('Image.retrieve', imagename=user.avatar) }}" alt="..." style="width:100px;height:100px;">
+      </a>
+    </div>
+    <div class="media-body">
+      <h3 class="media-heading">{{ user.username }}</h3>
+      {% if profile %}
+      <p><b>简介:</b> {{ profile.brief }}</p>
+      <p><b>邮箱:</b> {{ profile.mail }}</p>
+      <p><b>主页:</b> {{ profile.homepage }}</p>
+      {% endif %}
+      {% if current_user == user %}
+      <button type="button" class="btn btn-primary" href="" data-toggle="modal" data-target="#profile-modal">修改</button>
+      {% endif %}
+    </div>
+    <h3>最新文章</h3>
+    <hr>
+    {% for article in pagination.items %}
+    <div class="media">
+      <div class="media-body">
+        <h4 class="media-heading"><a href="">{{ article.title }}</a></h4>
+        <p class="text-muted">{{ article.brief }}...</p>
+        {% if article.cover %}
+        <img src="{{ url_for('Image.retrieve', imagename=article.cover.encode('utf-8')) }}" alt="" style="width:230px;height:138px;">
+        {% endif %}
+        <div class="clearfix" style="padding-top:10px;">
+          <span class="pull-left text-muted">{{ article.created }}</span>
+        </div>
+      </div>
+    </div>
+    <hr>
+    {% endfor %}
+    {{ macros.pagination_widget(pagination, 'User.profile') }}
+  </div>
+</div>
 {% endblock %}

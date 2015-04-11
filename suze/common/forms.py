@@ -13,3 +13,7 @@ class RegisterForm(Form):
     username = TextField('用户名', [validators.DataRequired()])
     password = PasswordField('密码', [validators.DataRequired()])
     confirm_password = PasswordField('确认密码', [validators.DataRequired()])
+
+
+class SearchForm(Form):
+    title = TextField('标题', [validators.DataRequired()])

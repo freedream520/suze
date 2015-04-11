@@ -1,0 +1,100 @@
+{% extends 'common/index.html' %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
+<script>
+  $(document).ready(function(){
+    var traffic_ctx = $("#traffic-chart").get(0).getContext("2d");
+    var favor_ctx = $("#favor-chart").get(0).getContext("2d");
+    var submit_ctx = $("#submit-chart").get(0).getContext("2d");
+
+    $.ajax({
+      type: "get",
+      url: "/admin/analyse/traffic/",
+      dataType: "json",
+      success: function(data){
+        var traffic_data = {
+          labels : data['labels'],
+          datasets : [
+            {
+              fillColor : "rgba(151,187,205,0.5)",
+              strokeColor : "rgba(151,187,205,1)",
+              pointColor : "rgba(151,187,205,1)",
+              pointStrokeColor : "#fff",
+              data : data['traffic'],
+            }
+          ]
+        }
+        var traffic_chart = new Chart(traffic_ctx).Line(traffic_data);
+      }
+    });
+    $.ajax({
+      type: "get",
+      url: "/admin/analyse/interest/",
+      dataType: "json",
+      success: function (data) {
+        var favor_data = {
+          labels : data['category'],
+          datasets : [
+            {
+              fillColor : "rgba(151,187,205,0.5)",
+              strokeColor : "rgba(151,187,205,1)",
+              pointColor : "rgba(151,187,205,1)",
+              pointStrokeColor : "#fff",
+              data : data['count']
+            }
+          ]
+        }
+        var favor_chart = new Chart(favor_ctx).Radar(favor_data);
+      }
+    });
+    $.get('/admin/analyse/submit/', {}, function(ret){
+      var submit_data = {
+        labels : ["[0, 10)", "[10, 100)", "[100, 500)", ">= 500"],
+        datasets : [
+          {
+            fillColor : "rgba(151,187,205,0.5)",
+            strokeColor : "rgba(151,187,205,1)",
+            data : eval(ret),
+          }
+        ]
+      }
+      var submit_chart = new Chart(submit_ctx).Bar(submit_data);
+    });
+  });
+</script>
+{% endblock %}
+
+{% block center_block %}
+<div class="row">
+  <div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked nav-pills-stacked-example">
+      <li role="presentation" class="active"><a href="{{ url_for('Admin.analyse') }}">数据统计</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.carousel') }}">轮播编辑</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.article') }}">文章管理</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.category') }}">栏目管理</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.permission') }}">用户权限管理</a></li>
+    </ul>
+  </div>
+  <div class="col-md-9">
+    <div class="panel panel-default">
+      <div class="panel-heading">24小时流量变动</div>
+      <div class="panel-body">
+        <canvas id="traffic-chart" style="width:100%;height:400px;"></canvas>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">兴趣分布</div>
+      <div class="panel-body">
+        <canvas id="favor-chart" style="width:100%;height:400px;"></canvas>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">投稿数分布</div>
+      <div class="panel-body">
+        <canvas id="submit-chart" style="width:100%;height:400px;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

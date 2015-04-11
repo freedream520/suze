@@ -1,0 +1,154 @@
+{% extends 'common/index.html' %}
+
+{% block center_block %}
+<div class="modal fade" id="new-carousel-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">新建轮播</h4>
+      </div>
+      <form enctype="multipart/form-data" action="{{ url_for('Admin.carousel') }}" method="POST">
+        <div class="modal-body">
+            <div class="form-group">
+              {{ carousel_form.title.label }}
+              {{ carousel_form.title(class='form-control') }}
+            </div>
+            <div class="form-group">
+              {{ carousel_form.brief.label }}
+              {{ carousel_form.brief(class='form-control') }}
+            </div>
+            <div class="form-group">
+              {{ carousel_form.url.label }}
+              {{ carousel_form.url(class='form-control') }}
+            </div>
+            <div class="form-group">
+              {{ carousel_form.order_num.label }}
+              {{ carousel_form.order_num(class='form-control') }}
+            </div>
+            <div class="form-group">
+              {{ carousel_form.cover.label }}
+              {{ carousel_form.cover }}
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-primary">新建</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="update-carousel-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">编辑轮播</h4>
+      </div>
+      <form enctype="multipart/form-data" action="{{ url_for('Admin.update_carousel') }}" method="POST">
+        <div class="modal-body">
+          <input type="hidden" name="carousel_id" id="carousel_id">
+          <div class="form-group">
+            {{ carousel_update_form.title.label }}
+            {{ carousel_update_form.title(class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ carousel_update_form.brief.label }}
+            {{ carousel_update_form.brief(class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ carousel_update_form.url.label }}
+            {{ carousel_update_form.url(class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ carousel_update_form.order_num.label }}
+            {{ carousel_update_form.order_num(class='form-control') }}
+          </div>
+          <div class="form-group">
+            {{ carousel_update_form.cover.label }}
+            {{ carousel_update_form.cover }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-primary">修改</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked nav-pills-stacked-example">
+      <li role="presentation"><a href="{{ url_for('Admin.analyse') }}">数据统计</a></li>
+      <li role="presentation" class="active"><a href="{{ url_for('Admin.carousel') }}">轮播编辑</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.article') }}">文章管理</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.category') }}">栏目管理</a></li>
+      <li role="presentation"><a href="{{ url_for('Admin.permission') }}">用户权限管理</a></li>
+    </ul>
+  </div>
+  <div class="col-md-9 clearfix">
+    <table class="table">
+      <tr>
+        <th style="text-align:center;">序号</th>
+        <th style="text-align:center;">标题</th>
+        <th style="text-align:center;">摘要</th>
+        <th style="text-align:center;">链接</th>
+        <th style="text-align:center;">封面</th>
+        <th style="text-align:center;">操作</th>
+      </tr>
+      {% for carousel in carousels %}
+      <tr>
+        <td style="text-align:center;">{{ carousel.order_num }}</td>
+        <td style="text-align:center;">{{ carousel.title }}</td>
+        <td style="text-align:center;">{{ carousel.brief }}</td>
+        <td style="text-align:center;">{{ carousel.url }}</td>
+        <td style="text-align:center;"><img src="{{ url_for('Image.retrieve', imagename=carousel.cover) }}" style="width:80px;height:60px;"></td>
+        <td style="text-align:center;">
+          <button data-toggle="modal" data-target="#update-carousel-modal" type="button" class="btn btn-default update-carousel" aria-label="Left Align"
+            _order_num="{{ carousel.order_num }}"
+            _title="{{ carousel.title }}"
+            _brief="{{ carousel.brief }}"
+            _carousel_id="{{ carousel.id }}"
+            _url="{{ carousel.url }}">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="btn btn-default delete-carousel" aria-label="Left Align" _url="{{ url_for('Admin.delete_carousel', carousel_id=carousel.id) }}">
+            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#new-carousel-modal">
+      新建轮播
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function(){
+    $(".delete-carousel").click(function(){
+      if(confirm("确认删除这条轮播?")){
+        window.location.href = $(this).attr("_url");
+      }
+    });
+
+    $(".update-carousel").click(function(){
+      var order_num = $(this).attr("_order_num");
+      var title = $(this).attr("_title");
+      var brief = $(this).attr("_brief");
+      var url = $(this).attr("_url");
+      var carousel_id = $(this).attr("_carousel_id");
+      $("#update-carousel-modal #order_num").val(order_num);
+      $("#update-carousel-modal #title").val(title);
+      $("#update-carousel-modal #brief").val(brief);
+      $("#update-carousel-modal #url").val(url);
+      $("#update-carousel-modal #carousel_id").val(carousel_id);
+    });
+  });
+</script>
+{% endblock %}

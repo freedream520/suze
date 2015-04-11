@@ -1,37 +1,39 @@
 {% macro pagination_widget(pagination, endpoint) %}
-<ul class="uk-pagination" style="margin-top:30px;">
-  <li {% if not pagination.has_prev %}class="uk-disabled"{% endif %}>
-    {% if pagination.has_prev %}
-    <a href="{{ url_for(endpoint, page=pagination.page - 1, **kwargs) }}">
-      <i class="uk-icon-angle-double-left"></i>
-    </a>
-    {% else %}
-    <span>
-      <i class="uk-icon-angle-double-left"></i>
-    </span>
-    {% endif %}
-  </li>
-  {% for p in pagination.iter_pages() %}
-    {% if p %}
-      {% if p == pagination.page %}
-      <li class="uk-active"><span>{{ p }}</span></li>
+<nav class="pull-right">
+  <ul class="pagination">
+    <li {% if not pagination.has_prev %}class="uk-disabled"{% endif %}>
+      {% if pagination.has_prev %}
+      <a href="{{ url_for(endpoint, page=pagination.page - 1, **kwargs) }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
       {% else %}
-      <li><a href="{{ url_for(endpoint, page=p, **kwargs)}}">{{ p }}</a></li>
+      <span>
+        <span aria-hidden="true">&laquo;</span>
+      </span>
       {% endif %}
+    </li>
+    {% for p in pagination.iter_pages() %}
+    {% if p %}
+    {% if p == pagination.page %}
+    <li class="active"><span>{{ p }}</span></li>
+    {% else %}
+    <li><a href="{{ url_for(endpoint, page=p, **kwargs)}}">{{ p }}</a></li>
+    {% endif %}
     {% else %}
     <li class="disabled"><a href="#">&hellip;</a></li>
     {% endif %}
-  {% endfor %}
-  <li {% if not pagination.has_next %}class="uk-disabled"{% endif %}>
-    {% if pagination.has_next %}
-    <a href="{{ url_for(endpoint, page=pagination.page + 1, **kwargs) }}">
-      <i class="uk-icon-angle-double-right"></i>
-    </a>
-    {% else %}
-    <span>
-      <i class="uk-icon-angle-double-right"></i>
-    </span>
-    {% endif %}
-  </li>
-</ul>
+    {% endfor %}
+    <li {% if not pagination.has_next %}class="uk-disabled"{% endif %}>
+      {% if pagination.has_next %}
+      <a href="{{ url_for(endpoint, page=pagination.page + 1, **kwargs) }}">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+      {% else %}
+      <span>
+        <span aria-hidden="true">&raquo;</span>
+      </span>
+      {% endif %}
+    </li>
+  </ul>
+</nav>
 {% endmacro %}

@@ -1,47 +1,61 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from flask import render_template, url_for, redirect, request
+from flask import render_template, url_for, redirect, request, flash
 from flask.ext.login import login_required, current_user
 from forms import CreateForm
 from suze.article import BPArticle
-from suze.models import Article, Tag
+from suze.models import Article, Category, Traffic
 from suze.comment.forms import CommentForm
+from suze.utils.common import save_file, check_permission
+from datetime import datetime
 
 @BPArticle.route('/retrieve/<int:article_id>/')
 def retrieve(article_id):
+    hour = datetime.now().hour
+    t = Traffic.query.filter_by(hour=hour).first()
+    if t is None:
+        t = Traffic(hour, 0)
+        t.save()
+    t.count += 1
+    t.update()
     article = Article.query.get(article_id)
-    if not article:
+    article.clicks += 1
+    article.update()
+    if (not article) or article.deleted:
         return redirect(url_for('Common.index', page=1))
 
     form = CommentForm()
-    return render_template('article/retrieve.html', article=article, form=form)
+    return render_template('article/retrieve.html', article=article, comment_form=form)
 
 
 @BPArticle.route('/create/', methods=['GET', 'POST'])
 @login_required
 def create():
+    if not check_permission(current_user, 'article'):
+        flash('你没有权限')
+        return redirect(url_for('Common.index'))
     form = CreateForm(request.form)
+    form.category_id.choices = [(c.id, c.category_name) for c in Category.query.all()]
     if request.method == 'POST' and form.validate():
         title = form.title.data
-        tags = form.tags.data
         html_content = form.html_content.data
         raw_content = form.raw_content.data
+        category_id = form.category_id.data
         brief = raw_content[:100]
 
-        tags = sorted(filter(lambda x: len(x), map(lambda x: x.strip(), list(set(tags.split("#"))))))
+        article = Article(current_user.id, title, brief, raw_content, html_content, category_id)
 
-        def create_tag(tagname):
-            t = Tag(tagname)
-            t.save()
+        f = request.files['cover']
+        if f:
+            try:
+                article.cover = save_file(f)
+            except Exception, e:
+                pass
 
-            return t
-
-        tags = map(create_tag, tags)
-        article = Article(current_user.id, title, brief, tags, raw_content, html_content)
         article.save()
 
-        return redirect(url_for('Article.retrieve', article_id=article.id))
+        return redirect(url_for('Common.index'))
 
     return render_template('article/create.html', form=form)
 
@@ -50,47 +64,54 @@ def create():
 @login_required
 def update(article_id):
     article = Article.query.get(article_id)
-    if not article:
-        return redirect(url_for('Common.index'))
-
     form = CreateForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form.category_id.choices = [(c.id, c.category_name) for c in Category.query.all()]
+    if form.validate():
         title = form.title.data
-        tags = form.tags.data
         html_content = form.html_content.data
         raw_content = form.raw_content.data
+        category_id = form.category_id.data
         brief = raw_content[:100]
-
-        tags = sorted(filter(lambda x: len(x), map(lambda x: x.strip(), list(set(tags.split("#"))))))
-
-        def create_tag(tagname):
-            t = Tag(tagname)
-            t.save()
-
-            return t
-
-        tags = map(create_tag, tags)
+        category_id = form.category_id.data
 
         article.title = title
         article.brief = brief
-        article.tags = tags
         article.raw_content = raw_content
         article.html_content = html_content
+        article.category_id = category_id
+
+        f = request.files['cover']
+        if f:
+            try:
+                article.cover = save_file(f)
+            except Exception, e:
+                pass
 
         article.update()
 
         return redirect(url_for('Article.retrieve', article_id=article.id))
 
-    tags = '#'.join([x.tagname for x in article.tags.all()])
-
-    return render_template('article/update.html', form=form, article=article, tags=tags)
+    kwargs = dict(
+        form=form,
+        article=article,
+    )
+    return render_template('article/update.html', **kwargs)
 
 
 @BPArticle.route('/delete/<int:article_id>/', methods=['GET'])
 @login_required
 def delete(article_id):
     article = Article.query.get(article_id)
-    if article and current_user == article.author:
+    if article:
         article.delete()
 
-    return redirect(url_for('Common.index'))
+    return 'SUCCESS'
+
+@BPArticle.route('/recover/<int:article_id>/', methods=['GET'])
+@login_required
+def recover(article_id):
+    article = Article.query.get(article_id)
+    if article:
+        article.recover()
+
+    return 'SUCCESS'

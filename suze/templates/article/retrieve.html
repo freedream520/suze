@@ -1,128 +1,101 @@
 {% extends 'common/index.html' %}
 
-{% block css %}
-{{ super() }}
+{% block main %}
 <style>
-  article .uk-list li {
-    float: left;
-    margin-right: 10px;
-  }
-
-  article.uk-comment:not(:last-of-type) {
-    margin-bottom: 30px;
-  }
-
-  .uk-comment-body {
-    color: #333;
-  }
-
-  img.avatar {
-    width: 75px;
-    height: 75px;
-  }
-
-  img.uk-comment-avatar {
-    width: 50px;
-    height: 50px;
-  }
-
-  h4.uk-comment-title {
-    margin: 0;
+  #article img {
+    max-width: 80%;
   }
 </style>
-{% endblock %}
-
-{% block main %}
-<div>
-  <article class="uk-article">
-    <h2>{{ article.title }}</h2>
-    <p class="uk-article-meta">
-      <ul class="uk-list uk-clearfix">
-        <li>
-          <a href="{{ url_for('User.profile', user_id=article.author.id) }}">
-            <img class="avatar"
-            src="{{ url_for('Image.retrieve', imagename=article.author.avatar) }}" alt="">
-          </a>
-        </li>
-        <li class="uk-text-muted">
-          <p>
-            <a href="{{ url_for('User.profile', user_id=article.author.id) }}">{{ article.author.username }}</a>
-            <span class="uk-text-mu"> | {{ article.created }}</span>
-          </p>
-          <hr>
-          <p>
-            {% for tag in article.tags.all() %}
-            <span class="uk-badge">{{ tag.tagname }}</span>
-            {% endfor %}
-            {% if not article.tags.all()|length %}
-            <span class="uk-text-muted">无标签</span>
-            {% endif %}
-          </p>
-        </li>
-      </ul>
-    </p>
-    {% if current_user == article.author %}
-    <p>
-      <a class="uk-button uk-button-success" href="{{ url_for('Article.update', article_id=article.id) }}">修改</a>
-      <button id="delete" onclick="delete_article(this)" class="uk-button uk-button-danger" type="button" link="{{ url_for('Article.delete', article_id=article.id) }}">删除</button>
-    </p>
-    {% endif %}
-    <hr class="uk-article-divider">
-    {{ article.html_content|safe }}
-  </article>
-  <hr class="uk-article-divider">
-  {% for comment in article.comments.filter_by(deleted=False).all()|reverse %}
-  <article class="uk-comment {% if comment.author == article.author %}uk-comment-primary{% endif %}">
-    <header class="uk-comment-header">
-      <a href="">
-        <img class="uk-comment-avatar" src="{{ url_for('Image.retrieve', imagename=comment.author.avatar) }}"
-        width="50" height="50" alt="">
-      </a>
-      <h4 class="uk-comment-title"><a href="">{{ comment.author.username }}</a></h4>
-      <div class="uk-comment-meta">{{ comment.created }} | <a class="reply">回复</a>
-        {% if (comment.author == current_user) or (article.author == current_user) %}
-        &nbsp;|&nbsp;<a href="{{ url_for('Comment.delete', article_id=article.id, comment_id=comment.id) }}" class="uk-text-danger">删除</a>
-        {% endif %}
+<div class="modal fade" id="qrcode-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" style="text-align:center;padding:10px;">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">二维码</h4>
       </div>
-    </header>
-    <div class="uk-comment-body">{{ comment.html_content|safe }}</div>
-  </article>
-  {% endfor %}
-  {% if article.comments.filter_by(deleted=False).all()|length %}
-  <hr class="uk-article-divider">
-  {% endif %}
-  <a name="comment"></a>
-  <form method="POST" action="{{ url_for('Comment.create', article_id=article.id) }}" class="uk-form">
-    <div class="uk-form-row">
-      {{ form.content(style="width:100%;", rows="5", id="comment-editor") }}
+      <div id="qrcode" class="modal-content">
+      </div>
     </div>
-    <div class="uk-form-row uk-clearfix">
-      <button type="submit" class="uk-button uk-button-primary uk-float-right">评论</button>
+  </div>
+</div>
+<div class="panel panel-default" id="article">
+  <div class="panel-body">
+    <h4>{{ article.title }}</h4>
+    <a href="{{ url_for('User.profile', user_id=article.author.id) }}">{{ article.author.username }}</a><span class="text-muted"> | {{ article.created }}</span>
+    {% if current_user.is_authenticated() and article.author == current_user %}
+    <div>
+      <a href="{{ url_for('Article.update', article_id=article.id) }}" class="btn btn-primary btn-sm">编辑</a>
+      <button type="button" class="btn btn-danger btn-sm delete-article" _article_id="{{ article.id }}">删除</button>
     </div>
-  </form>
+    {% endif %}
+    <hr>
+    {{ article.html_content|safe }}
+    <hr>
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#qrcode-modal">二维码</button>
+  </div>
+</div>
+<a name="comment_editor"></a>
+<div class="panel panel-default">
+  <div class="panel-heading">评论</div>
+  <div class="panel-body">
+    {% if current_user.is_authenticated()  %}
+    <form action="{{ url_for('Comment.create', article_id=article.id) }}" method="POST">
+      <div class="form-group">
+        {{ comment_form.content.label }}
+        {{ comment_form.content(class='form-control', style="height:100px;") }}
+      </div>
+      <div class="form-group clearfix">
+        <button type="submit" class="btn btn-default pull-right">评论</button>
+      </div>
+    </form>
+    <hr>
+    {% endif %}
+    {% for comment in article.comments|reverse %}
+    <div class="media">
+      <div class="media-left">
+        <a href="{{ url_for('User.profile', user_id=comment.author.id) }}">
+          <img class="media-object" src="{{ url_for('Image.retrieve', imagename=comment.author.avatar) }}"
+          style="width:70px;height:70px;"/>
+        </a>
+      </div>
+      <div class="media-body">
+        <h5 class="media-heading clearfix"><a href="{{ url_for('User.profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a><span class="text-muted pull-right">{{ comment.created }}</span></h5>
+        <p>{{ comment.html_content|safe }}</p>
+        <div class="clearfix"><a class="pull-right reply" style="cursor:pointer;">回复</a></div>
+      </div>
+    </div>
+    {% if not loop.last %}
+    <hr>
+    {% endif %}
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
 
 {% block js %}
-{{ super() }}
+<script src="{{ url_for('static', filename='js/jquery.qrcode.min.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function(){
-    var $comment_editor = $("#comment-editor");
+    var $comment_editor = $("#content");
+    $('#qrcode').qrcode(window.location.href);
     $(".reply").click(function(){
-      var $parent = $(this).parents(".uk-comment");
-      var author = $parent.find(".uk-comment-title a").text();
-      var content = $parent.find(".uk-comment-body").text();
+      var $parent = $(this).parents(".media-body");
+      var author = $parent.find(".media-heading a").text();
+      var content = $parent.find("p").text();
       $comment_editor.val("//@" + author + ": " + content);
-      document.getElementById("comment-editor").setSelectionRange(0, 0);
-      window.location.href = "#comment";
+      document.getElementById("content").setSelectionRange(0, 0);
+      window.location.href = "#comment_editor";
       $comment_editor.focus();
     });
 
-    delete_article = function(obj){
-      if(confirm("确认删除这篇文章?")){
-        window.location.href = $(obj).attr("link");
+    $(".delete-article").click(function(){
+      var article_id = $(this).attr("_article_id");
+      if(confirm("确定删除这篇文章?")){
+        $.get("/article/delete/" + article_id + "/", {}, function(ret){
+          window.location.href = "/";
+        });
       }
-    }
+    });
   });
 </script>
 {% endblock %}

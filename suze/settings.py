@@ -11,3 +11,8 @@ UPLOAD_FOLDER = join(dirname(abspath(__file__)), 'uploads')
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp'])
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 SERVER_NAME = 'localhost:8080'
+PERMISSION = dict(
+    admin=1 << 0,
+    article=1 << 1,
+    comment=1 << 2,
+)

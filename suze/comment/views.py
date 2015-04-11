@@ -5,22 +5,26 @@ from __future__ import unicode_literals
 import re
 
 from forms import CommentForm
-from flask import url_for, request, redirect
+from flask import url_for, request, redirect, flash
 from flask.ext.login import login_required, current_user
 from suze.comment import BPComment
-from suze.models import Article, Comment
+from suze.models import Article, Comment, User
+from suze.utils.common import check_permission
 
 
 @BPComment.route('/create/<int:article_id>/', methods=['GET', 'POST'])
 @login_required
 def create(article_id):
-
+    if not check_permission(current_user, 'comment'):
+        flash('你没有权限')
+        return redirect(url_for('Article.retrieve', article_id=article_id))
     form = CommentForm(request.form)
     if form.validate():
         article = Article.query.get(article_id)
         raw_content = form.content.data
         def _replace(matched):
-            return "<a href='/user/retrieve/{username}/'>@{username}</a>:"\
+            user = User.query.filter_by(username=matched.group('username')).first()
+            return "<a href=" + url_for('User.profile', user_id=user.id) + ">@{username}</a>:"\
                     .format(username=matched.group('username'))
         html_content = re.sub(r'@(?P<username>[^:]+):', _replace, raw_content)
         comment = Comment(article.id, current_user.id, html_content)

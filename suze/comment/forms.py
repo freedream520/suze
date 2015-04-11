@@ -5,4 +5,4 @@ from wtforms import Form, TextAreaField, validators
 
 
 class CommentForm(Form):
-    content = TextAreaField('', [validators.DataRequired()])
+    content = TextAreaField('评论内容', [validators.DataRequired()])

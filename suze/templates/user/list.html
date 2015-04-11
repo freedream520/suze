@@ -1,0 +1,21 @@
+{% extends 'common/index.html' %}
+{% import 'macros.html' as macros %}
+
+{% block center_block %}
+<div class="panel panel-default">
+  <div class="panel-heading">自媒体列表</div>
+  <div class="panel-body">
+    <div class="row">
+      {% for user in pagination.items %}
+      <div class="col-md-1">
+        <a href="{{ url_for('User.profile', user_id=user.id) }}">
+          <img src="{{ url_for('Image.retrieve', imagename=user.avatar) }}" alt="" style="width:70px;height:70px;">
+          <p style="text-align:center;">{{ user.username }}</p>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    {{ macros.pagination_widget(pagination, 'User.list') }}
+  </div>
+</div>
+{% endblock %}

@@ -14,10 +14,14 @@ from suze.utils.common import save_file
 
 
 @BPUser.route('/profile/<int:user_id>/', methods=['GET', 'POST'])
-def profile(user_id):
+@BPUser.route('/profile/<int:user_id>/<int:page>/', methods=['GET', 'POST'])
+def profile(user_id, page=1):
     user = User.query.get(user_id)
     if not user:
         return redirect(url_for('Common.index'))
+
+    pagination = Article.query.filter_by(deleted=False, author=user).order_by(Article.id.desc())\
+            .paginate(page, per_page=10, error_out=True)
 
     form = ProfileForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -40,7 +44,13 @@ def profile(user_id):
         user.save()
 
     profile = json.loads(user.verbose) if user.verbose else None
-    return render_template('user/profile.html', user=user, form=form, profile=profile)
+    kwargs = dict(
+        user=user,
+        profile_form=form,
+        profile=profile,
+        pagination=pagination,
+    )
+    return render_template('user/profile.html', **kwargs)
 
 
 @BPUser.route('/password/<int:user_id>/', methods=['GET', 'POST'])
@@ -84,3 +94,12 @@ def article(user_id, page=1):
             .paginate(page, per_page=10, error_out=True)
 
     return render_template('user/article.html', user=user, pagination=pagination)
+
+
+@BPUser.route('/list/')
+@BPUser.route('/list/<int:page>/')
+def list(page=1):
+    pagination = User.query.order_by(User.id.desc())\
+            .paginate(page, per_page=96, error_out=True)
+
+    return render_template('user/list.html', pagination=pagination)

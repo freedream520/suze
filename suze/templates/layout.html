@@ -13,6 +13,7 @@
     <link href="{{ url_for('static', filename='img/logo.ico') }}" rel="shortcut icon" type="image/x-icon" />
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='uikit/js/uikit.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='uikit/js/uikit.min.js') }}"></script>
     <style>
       #content-block {
         padding-top: 30px;
@@ -32,11 +33,9 @@
     {% block navbar %}
     <nav class="tm-navbar uk-navbar uk-navbar-attached">
       <div class="uk-container uk-container-center">
-        <a href="{{ url_for('Common.index') }}" class="uk-navbar-brand">Suze</a>
+        <a href="{{ url_for('Common.index') }}" class="uk-navbar-brand">自媒体</a>
         <ul class="uk-navbar-nav uk-hidden-small">
-          <li><a href="{{ url_for('Common.index') }}">文章</a></li>
-          <li><a href="core.html">热评</a></li>
-          <li><a href="">话题</a></li>
+          <li><a href="">自媒体列表</a></li>
         </ul>
         <div class="uk-navbar-content uk-hidden-small">
           <form class="uk-form uk-margin-remove uk-display-inline-block">
